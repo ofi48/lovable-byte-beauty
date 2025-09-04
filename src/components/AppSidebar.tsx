@@ -44,7 +44,7 @@ export function AppSidebar() {
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive 
-      ? "bg-sidebar-accent text-white font-medium border-l-4 border-sidebar-primary h-14 px-6" 
+      ? "bg-sidebar-accent text-white font-medium h-14 px-6" 
       : "hover:bg-sidebar-accent/50 text-white h-14 px-6";
 
   return (

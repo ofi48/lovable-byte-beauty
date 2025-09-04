@@ -61,7 +61,33 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				pink: {
+					DEFAULT: 'hsl(var(--pink-accent))',
+					accent: 'hsl(var(--pink-accent))'
+				},
+				yellow: {
+					DEFAULT: 'hsl(var(--yellow-accent))',
+					accent: 'hsl(var(--yellow-accent))'
+				},
+				purple: {
+					DEFAULT: 'hsl(var(--purple-accent))',
+					accent: 'hsl(var(--purple-accent))'
+				},
+				cyan: {
+					DEFAULT: 'hsl(var(--cyan-accent))',
+					accent: 'hsl(var(--cyan-accent))'
 				}
+			},
+			backgroundImage: {
+				'gradient-pink': 'var(--gradient-pink)',
+				'gradient-yellow': 'var(--gradient-yellow)',
+				'gradient-purple': 'var(--gradient-purple)',
+				'gradient-primary': 'var(--gradient-primary)'
+			},
+			boxShadow: {
+				'glow': 'var(--shadow-glow)',
+				'card': 'var(--shadow-card)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

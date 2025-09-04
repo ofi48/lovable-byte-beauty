@@ -12,8 +12,8 @@ export const Logo = ({ size = 'md', className = '' }: LogoProps) => {
 
   return (
     <div className={`font-bold text-foreground ${sizeClasses[size]} ${className}`}>
-      <span className="text-pink-accent">logo</span>
-      <span className="text-foreground">tipo</span>
+      <span className="text-purple-accent">Byte</span>
+      <span className="text-foreground"> Toolkit</span>
     </div>
   );
 };

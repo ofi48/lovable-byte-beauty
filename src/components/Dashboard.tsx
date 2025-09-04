@@ -11,8 +11,8 @@ const functions = [
     title: 'Video Spoofer',
     description: 'Advanced video manipulation and deepfake detection tools',
     icon: Video,
-    gradientClass: 'from-pink-accent/20 to-pink-accent/40',
-    iconColor: 'text-pink-accent'
+    gradientClass: 'from-purple-accent/20 to-purple-accent/40',
+    iconColor: 'text-purple-accent'
   },
   {
     id: 'image-spoofer' as const,

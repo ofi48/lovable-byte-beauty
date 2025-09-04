@@ -25,7 +25,7 @@ const tools = [
     title: "Video Spoofer", 
     url: "/video-spoofer", 
     icon: Video,
-    color: "text-pink-accent"
+    color: "text-purple-accent"
   },
   { 
     title: "Image Spoofer", 

@@ -33,7 +33,7 @@ export class VideoProcessor {
     this.ffmpeg = new FFmpeg();
     
     // Load FFmpeg WebAssembly
-    const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd'
+    const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd'
     this.ffmpeg.on('log', ({ message }) => {
       console.log(message);
     });
@@ -41,7 +41,6 @@ export class VideoProcessor {
     await this.ffmpeg.load({
       coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
       wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-      workerURL: await toBlobURL(`${baseURL}/ffmpeg-core.worker.js`, 'text/javascript'),
     });
 
     this.isLoaded = true;

@@ -11,24 +11,24 @@ const functions = [
     title: 'Video Spoofer',
     description: 'Advanced video manipulation and deepfake detection tools',
     icon: Video,
-    gradientClass: 'from-purple-accent/20 to-purple-accent/40',
-    iconColor: 'text-purple-accent'
+    gradientClass: 'from-purple-600 to-purple-400',
+    iconColor: 'text-purple-100'
   },
   {
     id: 'image-spoofer' as const,
     title: 'Image Spoofer',
     description: 'Sophisticated image analysis and manipulation detection',
     icon: Image,
-    gradientClass: 'from-yellow-accent/20 to-yellow-accent/40',
-    iconColor: 'text-yellow-accent'
+    gradientClass: 'from-yellow-600 to-yellow-400',
+    iconColor: 'text-yellow-100'
   },
   {
     id: 'similarity-detector' as const,
     title: 'Similarity Detector',
     description: 'AI-powered content similarity and duplicate detection',
     icon: Search,
-    gradientClass: 'from-cyan-accent/20 to-cyan-accent/40',
-    iconColor: 'text-cyan-accent'
+    gradientClass: 'from-cyan-600 to-cyan-400',
+    iconColor: 'text-cyan-100'
   }
 ];
 

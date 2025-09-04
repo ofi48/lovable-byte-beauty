@@ -16,12 +16,6 @@ import { Logo } from "./Logo";
 
 const tools = [
   { 
-    title: "Dashboard", 
-    url: "/", 
-    icon: BarChart3,
-    color: "text-purple-accent"
-  },
-  { 
     title: "Video Spoofer", 
     url: "/video-spoofer", 
     icon: Video,
@@ -50,8 +44,8 @@ export function AppSidebar() {
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive 
-      ? "bg-sidebar-accent text-sidebar-primary font-medium border-l-4 border-sidebar-primary" 
-      : "hover:bg-sidebar-accent/50 text-sidebar-foreground";
+      ? "bg-sidebar-accent text-white font-medium border-l-4 border-sidebar-primary h-14 px-6" 
+      : "hover:bg-sidebar-accent/50 text-white h-14 px-6";
 
   return (
     <Sidebar collapsible="icon">
@@ -62,7 +56,7 @@ export function AppSidebar() {
         </div>
 
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/80 text-sm font-medium px-4 py-2">
+          <SidebarGroupLabel className="text-white/80 text-sm font-medium px-4 py-2">
             Tools
           </SidebarGroupLabel>
 

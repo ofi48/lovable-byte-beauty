@@ -1,15 +1,16 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Upload, Play, Download, X, Archive, Trash2 } from "lucide-react";
+import { Upload, Play, Download, X, Archive, Trash2, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { videoProcessor, type VideoProcessingParameters } from "@/utils/videoProcessor";
 
 interface BatchVideoProcessorProps {
-  parameters: any;
+  parameters: VideoProcessingParameters;
 }
 
 interface QueueItem {
@@ -17,14 +18,37 @@ interface QueueItem {
   file: File;
   status: 'pending' | 'processing' | 'completed' | 'error';
   progress: number;
-  variations: string[];
+  variations: Blob[];
 }
 
 export const BatchVideoProcessor = ({ parameters }: BatchVideoProcessorProps) => {
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [processing, setProcessing] = useState(false);
   const [numberOfVariations, setNumberOfVariations] = useState(3);
+  const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const initializeFFmpeg = async () => {
+      try {
+        await videoProcessor.initialize();
+        setFfmpegLoaded(true);
+        toast({
+          title: "Batch processor ready",
+          description: "FFmpeg has been loaded and is ready for batch processing",
+        });
+      } catch (error) {
+        console.error('Failed to initialize FFmpeg:', error);
+        toast({
+          title: "Processing unavailable",
+          description: "Failed to load video processing engine. Using fallback mode.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    initializeFFmpeg();
+  }, [toast]);
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -76,58 +100,117 @@ export const BatchVideoProcessor = ({ parameters }: BatchVideoProcessorProps) =>
       
       // Update status to processing
       setQueue(prev => prev.map(q => 
-        q.id === item.id ? { ...q, status: 'processing' as const } : q
+        q.id === item.id ? { ...q, status: 'processing' as const, progress: 0 } : q
       ));
 
-      // Simulate processing with progress
-      const totalSteps = numberOfVariations * 5;
-      for (let step = 0; step <= totalSteps; step++) {
-        await new Promise(resolve => setTimeout(resolve, 50));
-        const progress = (step / totalSteps) * 100;
-        
+      try {
+        if (ffmpegLoaded) {
+          // Real video processing
+          const processedVariations = await videoProcessor.generateVariations(
+            item.file,
+            parameters,
+            numberOfVariations,
+            (variation, progress) => {
+              setQueue(prev => prev.map(q => 
+                q.id === item.id ? { ...q, progress } : q
+              ));
+            }
+          );
+
+          // Mark as completed
+          setQueue(prev => prev.map(q => 
+            q.id === item.id ? { 
+              ...q, 
+              status: 'completed' as const, 
+              variations: processedVariations,
+              progress: 100 
+            } : q
+          ));
+        } else {
+          // Fallback: simulate processing
+          const totalSteps = numberOfVariations * 20;
+          for (let step = 0; step <= totalSteps; step++) {
+            await new Promise(resolve => setTimeout(resolve, 25));
+            const progress = (step / totalSteps) * 100;
+            
+            setQueue(prev => prev.map(q => 
+              q.id === item.id ? { ...q, progress } : q
+            ));
+          }
+
+          // Create mock variations (copies of original)
+          const mockVariations: Blob[] = [];
+          for (let j = 0; j < numberOfVariations; j++) {
+            const arrayBuffer = await item.file.arrayBuffer();
+            const mockVariation = new Blob([arrayBuffer], { type: item.file.type });
+            mockVariations.push(mockVariation);
+          }
+
+          // Mark as completed
+          setQueue(prev => prev.map(q => 
+            q.id === item.id ? { 
+              ...q, 
+              status: 'completed' as const, 
+              variations: mockVariations,
+              progress: 100 
+            } : q
+          ));
+        }
+      } catch (error) {
+        console.error(`Processing failed for ${item.file.name}:`, error);
         setQueue(prev => prev.map(q => 
-          q.id === item.id ? { ...q, progress } : q
+          q.id === item.id ? { ...q, status: 'error' as const } : q
         ));
       }
-
-      // Generate mock variations
-      const mockVariations = Array.from({ length: numberOfVariations }, (_, j) => 
-        `batch_${item.file.name.split('.')[0]}_variation_${j + 1}.mp4`
-      );
-
-      // Mark as completed
-      setQueue(prev => prev.map(q => 
-        q.id === item.id ? { 
-          ...q, 
-          status: 'completed' as const, 
-          variations: mockVariations,
-          progress: 100 
-        } : q
-      ));
     }
 
     setProcessing(false);
     
+    const completedCount = queue.filter(q => q.status === 'completed').length;
     toast({
       title: "Batch processing complete",
-      description: `Processed ${queue.length} videos with ${numberOfVariations} variations each`,
+      description: `Successfully processed ${completedCount} of ${queue.length} videos with ${numberOfVariations} variations each`,
     });
-  }, [queue, numberOfVariations, processing, toast]);
+  }, [queue, numberOfVariations, processing, parameters, ffmpegLoaded, toast]);
 
-  const downloadAllAsZip = () => {
-    toast({
-      title: "Preparing download",
-      description: "Creating ZIP archive with all variations...",
-    });
-    // Mock download functionality
+  const downloadAllAsZip = async () => {
+    try {
+      const allVariations: Blob[] = [];
+      completedItems.forEach(item => {
+        allVariations.push(...item.variations);
+      });
+
+      await videoProcessor.createZipWithVariations(allVariations, 'batch_processing');
+      
+      toast({
+        title: "Download started",
+        description: `Downloading all ${allVariations.length} variations from batch processing`,
+      });
+    } catch (error) {
+      toast({
+        title: "Download failed",
+        description: "Could not download batch variations. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const downloadVideoVariations = (variations: string[]) => {
-    toast({
-      title: "Preparing download",
-      description: `Creating ZIP with ${variations.length} variations...`,
-    });
-    // Mock download functionality
+  const downloadVideoVariations = async (variations: Blob[], fileName: string) => {
+    try {
+      const baseFileName = fileName.split('.')[0];
+      await videoProcessor.createZipWithVariations(variations, baseFileName);
+      
+      toast({
+        title: "Download started",
+        description: `Downloading ${variations.length} variations for ${fileName}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Download failed",
+        description: "Could not download variations. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const completedItems = queue.filter(item => item.status === 'completed');
@@ -140,9 +223,17 @@ export const BatchVideoProcessor = ({ parameters }: BatchVideoProcessorProps) =>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">Batch Upload</h3>
-            <Badge variant="outline" className="text-cyan-accent border-cyan-accent">
-              Batch Processing
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-cyan-accent border-cyan-accent">
+                Batch Processing
+              </Badge>
+              {!ffmpegLoaded && (
+                <Badge variant="outline" className="text-yellow-accent border-yellow-accent">
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  Fallback Mode
+                </Badge>
+              )}
+            </div>
           </div>
 
           <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
@@ -222,7 +313,7 @@ export const BatchVideoProcessor = ({ parameters }: BatchVideoProcessorProps) =>
           {totalVariations > 0 && (
             <Button
               onClick={downloadAllAsZip}
-              className="w-full bg-green-500 hover:bg-green-600"
+              className="w-full bg-green-accent hover:bg-green-accent/90 text-background font-semibold"
             >
               <Archive className="h-4 w-4 mr-2" />
               Download All as ZIP ({totalVariations} variations)
@@ -300,11 +391,11 @@ export const BatchVideoProcessor = ({ parameters }: BatchVideoProcessorProps) =>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => downloadVideoVariations(item.variations)}
-                          className="hover:bg-cyan-accent hover:text-white"
+                          onClick={() => downloadVideoVariations(item.variations, item.file.name)}
+                          className="hover:bg-cyan-accent hover:text-white border-cyan-accent/30"
                         >
                           <Download className="h-4 w-4 mr-2" />
-                          Download ZIP
+                          Download ZIP ({item.variations.length} files)
                         </Button>
                       </div>
                     </div>

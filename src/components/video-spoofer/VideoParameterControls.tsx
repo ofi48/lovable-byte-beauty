@@ -37,13 +37,20 @@ export const VideoParameterControls = ({ parameters, onParametersChange }: Video
     unit?: string;
     step?: number;
   }) => (
-    <div className="space-y-3">
+    <div className="space-y-3 p-4 bg-card/30 rounded-lg border border-muted transition-all duration-300 hover:border-pink-accent/30 hover:shadow-sm hover:shadow-pink-accent/10">
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-medium">{label}</Label>
-        <Switch 
-          checked={parameter.enabled}
-          onCheckedChange={(checked) => updateParameter(`${path}.enabled`, checked)}
-        />
+        <Label className="text-sm font-semibold text-foreground">{label}</Label>
+        <div className="flex items-center gap-2">
+          <span className={`text-xs px-2 py-1 rounded transition-colors ${
+            parameter.enabled ? 'bg-pink-accent/20 text-pink-accent' : 'bg-muted text-muted-foreground'
+          }`}>
+            {parameter.enabled ? 'Enabled' : 'Disabled'}
+          </span>
+          <Switch 
+            checked={parameter.enabled}
+            onCheckedChange={(checked) => updateParameter(`${path}.enabled`, checked)}
+          />
+        </div>
       </div>
       
       {parameter.enabled && (
@@ -52,26 +59,36 @@ export const VideoParameterControls = ({ parameters, onParametersChange }: Video
             <span>Min: {parameter.min}{unit}</span>
             <span>Max: {parameter.max}{unit}</span>
           </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Min Value</Label>
+          <div className="space-y-2 p-3 bg-card/50 rounded-lg border border-pink-accent/20">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-semibold text-pink-accent">Min Value</Label>
+              <span className="text-xs bg-pink-accent/10 px-2 py-1 rounded text-pink-accent font-mono">
+                {parameter.min.toFixed(step < 1 ? 1 : 0)}{unit}
+              </span>
+            </div>
             <Slider
               value={[parameter.min]}
               onValueChange={([value]) => updateParameter(`${path}.min`, value)}
               max={parameter.max * 2}
               min={0}
               step={step}
-              className="w-full"
+              className="w-full cursor-grab active:cursor-grabbing"
             />
           </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Max Value</Label>
+          <div className="space-y-2 p-3 bg-card/50 rounded-lg border border-pink-accent/20">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-semibold text-pink-accent">Max Value</Label>
+              <span className="text-xs bg-pink-accent/10 px-2 py-1 rounded text-pink-accent font-mono">
+                {parameter.max.toFixed(step < 1 ? 1 : 0)}{unit}
+              </span>
+            </div>
             <Slider
               value={[parameter.max]}
               onValueChange={([value]) => updateParameter(`${path}.max`, value)}
               max={parameter.max * 2}
               min={parameter.min}
               step={step}
-              className="w-full"
+              className="w-full cursor-grab active:cursor-grabbing"
             />
           </div>
         </div>
@@ -80,12 +97,21 @@ export const VideoParameterControls = ({ parameters, onParametersChange }: Video
   );
 
   const ToggleParameter = ({ label, parameter, path }: { label: string; parameter: any; path: string }) => (
-    <div className="flex items-center justify-between">
-      <Label className="text-sm font-medium">{label}</Label>
-      <Switch 
-        checked={parameter.enabled}
-        onCheckedChange={(checked) => updateParameter(`${path}.enabled`, checked)}
-      />
+    <div className="p-4 bg-card/30 rounded-lg border border-muted transition-all duration-300 hover:border-pink-accent/30 hover:shadow-sm hover:shadow-pink-accent/10">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-semibold text-foreground">{label}</Label>
+        <div className="flex items-center gap-2">
+          <span className={`text-xs px-2 py-1 rounded transition-colors ${
+            parameter.enabled ? 'bg-pink-accent/20 text-pink-accent' : 'bg-muted text-muted-foreground'
+          }`}>
+            {parameter.enabled ? 'Enabled' : 'Disabled'}
+          </span>
+          <Switch 
+            checked={parameter.enabled}
+            onCheckedChange={(checked) => updateParameter(`${path}.enabled`, checked)}
+          />
+        </div>
+      </div>
     </div>
   );
 
@@ -102,17 +128,21 @@ export const VideoParameterControls = ({ parameters, onParametersChange }: Video
           <div className="space-y-4">
             <h4 className="font-medium text-purple-accent">Video Quality</h4>
             
-            <div className="space-y-2">
-              <Label className="text-sm">Base Quality</Label>
+            <div className="space-y-3 p-3 bg-card/50 rounded-lg border border-purple-accent/20">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-semibold text-purple-accent">Base Quality</Label>
+                <span className="text-sm bg-purple-accent/10 px-3 py-1 rounded font-mono text-purple-accent">
+                  {parameters.videoQuality}%
+                </span>
+              </div>
               <Slider
                 value={[parameters.videoQuality]}
                 onValueChange={([value]) => updateParameter('videoQuality', value)}
                 max={100}
                 min={1}
                 step={1}
-                className="w-full"
+                className="w-full cursor-grab active:cursor-grabbing"
               />
-              <span className="text-xs text-muted-foreground">{parameters.videoQuality}%</span>
             </div>
 
             <RangeParameter

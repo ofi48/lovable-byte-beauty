@@ -44,6 +44,15 @@ All colors MUST be HSL.
     --yellow-accent: 45 100% 60%;     /* Vibrant Yellow */
     --purple-accent: 270 100% 70%;    /* Vibrant Purple */
     --cyan-accent: 180 100% 70%;      /* Vibrant Cyan */
+    --green-accent: 120 100% 60%;     /* Vibrant Green */
+    
+    /* Slider and control colors */
+    --slider-track: 213 71% 15%;
+    --slider-range: 313 100% 70%;     /* Pink accent for active slider */
+    --slider-thumb: 313 100% 70%;     /* Pink accent for thumb */
+    --switch-track: 213 71% 15%;
+    --switch-thumb: 0 0% 100%;
+    --switch-active: 313 100% 70%;    /* Pink accent when active */
 
     /* Gradients */
     --gradient-pink: linear-gradient(135deg, hsl(313 100% 70%), hsl(313 100% 60%));

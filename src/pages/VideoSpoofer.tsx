@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { VideoParameterControls } from "@/components/video-spoofer/VideoParameterControls";
 import { SingleVideoProcessor } from "@/components/video-spoofer/SingleVideoProcessor";
 import { BatchVideoProcessor } from "@/components/video-spoofer/BatchVideoProcessor";
+import { EnhancedSingleVideoProcessor } from "@/components/video-spoofer/EnhancedSingleVideoProcessor";
 
 const VideoSpoofer = () => {
   const [parameters, setParameters] = useState({
@@ -52,9 +53,10 @@ const VideoSpoofer = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="single" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="single">Single Video Processing</TabsTrigger>
+        <Tabs defaultValue="enhanced" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="enhanced">Enhanced Processing</TabsTrigger>
+            <TabsTrigger value="single">Single Processing</TabsTrigger>
             <TabsTrigger value="batch">Batch Processing</TabsTrigger>
           </TabsList>
 
@@ -69,6 +71,10 @@ const VideoSpoofer = () => {
 
             {/* Processing Area - Right Side */}
             <div className="xl:col-span-2">
+              <TabsContent value="enhanced" className="mt-0">
+                <EnhancedSingleVideoProcessor parameters={parameters} />
+              </TabsContent>
+              
               <TabsContent value="single" className="mt-0">
                 <SingleVideoProcessor parameters={parameters} />
               </TabsContent>
